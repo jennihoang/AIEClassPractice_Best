@@ -39,11 +39,14 @@ public class PlayerMovementComponent : MonoBehaviour
     public Camera MyMainCamera;
 
     public bool IsSprinting;
+    public float StaminaReductionSpeed;
+    public float CurrentStamina, MaxStamina;
 
     public bool Punch;
     void Start()
     {
         RB = GetComponent<Rigidbody>();
+        CurrentStamina = MaxStamina;
     }
 
     public void DoMovement()
@@ -76,22 +79,26 @@ public class PlayerMovementComponent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        IsSprinting = Input.GetKey(KeyCode.LeftShift);
         Debug.Log(transform.forward);
         DoMouseLook();
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (IsSprinting && CurrentStamina > 0)
         {
             CurrentSpeed = SprintSpeed;
+            CurrentStamina -= Time.deltaTime * StaminaReductionSpeed;
         }
         else
         {
+            if (CurrentStamina < MaxStamina)
+            { 
+            CurrentStamina += Time.deltaTime + StaminaReductionSpeed;
+            }
             CurrentSpeed = Walkspeed;
         }
 
-        //Sprinting is set to true when we press the lef shift key
-        IsSprinting = Input.GetKey(KeyCode.LeftShift);
         // Current speed changes to sprint or walk speed when sprinting is true or false
-        CurrentSpeed = (IsSprinting == true) ? SprintSpeed : Walkspeed;
+        // CurrentSpeed = (IsSprinting == true) ? SprintSpeed : Walkspeed;
 
         DoMovement();
 
